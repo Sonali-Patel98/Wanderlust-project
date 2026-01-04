@@ -2,6 +2,11 @@ const express=require('express');
 const { default: mongoose } = require('mongoose');
 const app=express();
 
+
+//for only exist get post if want put delete this type then first install  npm i method-override
+const methodOverride=require("method-override");
+app.use(methodOverride("_method"));
+
 //reuire model
 const Listing=require("./models/listening.js");
 
@@ -93,3 +98,20 @@ app.get("/listing/:id/edit",async(req,res)=>{
 })
 
 
+//update route 
+app.put("/listing/:id",async(req,res)=>{
+    let {id}=req.params;
+    await Listing.findByIdAndUpdate(id,req.body.listall);
+    
+    res.redirect("/listing");
+});
+
+
+
+//delete route
+app.delete("/listing/:id",async(req,res)=>{
+    let {id}=req.params;
+    let deletelisting=await Listing.findByIdAndDelete(id);
+    console.log(deletelisting);
+    res.redirect("/listing");
+});
