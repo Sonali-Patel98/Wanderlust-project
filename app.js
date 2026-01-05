@@ -3,6 +3,10 @@ const { default: mongoose } = require('mongoose');
 const app=express();
 
 
+//require ejs-mate for layout
+const ejsMate=require("ejs-mate");
+app.engine('ejs', ejsMate);
+
 //for only exist get post if want put delete this type then first install  npm i method-override
 const methodOverride=require("method-override");
 app.use(methodOverride("_method"));
@@ -14,6 +18,12 @@ const Listing=require("./models/listening.js");
 const path=require("path");
 app.set("views",path.join(__dirname,"views"));
 app.set("view engine","ejs");
+
+
+//require apply same css for all page
+app.use(express.static(path.join(__dirname,"/public")));
+
+
 
 //fetch requesting data like id
 app.use(express.urlencoded({extended:true}));
@@ -110,8 +120,8 @@ app.put("/listing/:id",async(req,res)=>{
 
 //delete route
 app.delete("/listing/:id",async(req,res)=>{
-    let {id}=req.params;
-    let deletelisting=await Listing.findByIdAndDelete(id);
+    const {id}=req.params;
+    const deletelisting=await Listing.findByIdAndDelete(id);
     console.log(deletelisting);
     res.redirect("/listing");
 });
