@@ -10,3 +10,10 @@
 //   country: 'United States',
 //   __v: 0
 // }
+
+//  <ul>
+//         <% for(let alldata of values) { %>
+//             <li><a href="/listing/<%=alldata._id%>"><%= alldata.title %></a></li>
+            
+//         <% } %>
+//     </ul>
