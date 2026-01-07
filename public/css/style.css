@@ -59,8 +59,15 @@ body{
     padding: 0 !important;
 }
 .card-text p{
-    font-weight: 400 !important;
+    font-weight: 400;
 }
 .listing-link{
     text-decoration: none;
+}
+.card-img-overlay{
+    opacity: 0;
+}
+.card-img-overlay:hover{
+    opacity: 0.2;
+    background-color: white;
 }
