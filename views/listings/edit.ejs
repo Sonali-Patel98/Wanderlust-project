@@ -1,13 +1,46 @@
 <% layout("/layouts/boilerplate") %>
-<body>
-    <h1>Create a new list</h1>
+    <br><br>
+    <div class="row">
+        <div class="col-8 offset-2">
+    <h1>Edit Your Listing</h1>
     <form method="post" action="/listing/<%=idvalues._id  %>?_method=put">
-        <input name="listall[title]" value="<%=idvalues.title %>" type="text"><br><br>
-        <textarea name="listall[description]" ><%=idvalues.description %></textarea><br><br>
-        <input name="listall[image]" value="<%=idvalues.image %>" type="text"><br><br>
-        <input name="listall[price]" value="<%=idvalues.price %>" type="number"><br><br>
-        <input name="listall[country]" value="<%=idvalues.country %>" type="text"><br><br>
-        <input name="listall[location]" value="<%=idvalues.location %>" type="text"><br><br>
-        <button>Add</button>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input name="listall[title]" 
+            value="<%=idvalues.title %>" 
+            type="text"
+            class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea 
+                name="listall[description]" class="form-control"><%=idvalues.description %>
+            </textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="image" class="form-label">Image Link</label>
+            <input name="listall[image][url]" value="<%=idvalues.image.url %>" type="text" class="form-control">
+       
+        </div>
+         
+         <div class="row">
+            <div class="mb-3 col-md-4">
+                <label for="price" class="form-label">Price</label>
+                <input name="listall[price]" value="<%=idvalues.price %>" type="number" class="form-control">
+            </div>
+            <div class="mb-3 col-md-8" >
+            <label for="country" class="form-label">Country</label>
+            <input name="listall[country]" value="<%=idvalues.country %>" type="text" class="form-control">
+            </div>
+        </div>
+        <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input name="listall[location]" value="<%=idvalues.location %>" type="text" class="form-control">
+            </div>
+        <br>
+        <button class="btn btn-dark add-btn">Edit</button>
+        <br><br>
     </form>
-</body>
+    </div>
+    </div>

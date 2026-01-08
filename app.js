@@ -94,6 +94,7 @@ app.get("/listing/:id",async(req,res)=>{
 //post new create
 app.post("/listing",async(req,res)=>{
     const listall=new Listing(req.body.listall);
+    listall.image.filename="listingimage";
     await listall.save();
     res.redirect("/listing");
 });
@@ -112,8 +113,7 @@ app.get("/listing/:id/edit",async(req,res)=>{
 app.put("/listing/:id",async(req,res)=>{
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id,req.body.listall);
-    
-    res.redirect("/listing");
+    res.redirect(`/listing/${id}`);
 });
 
 
@@ -122,6 +122,5 @@ app.put("/listing/:id",async(req,res)=>{
 app.delete("/listing/:id",async(req,res)=>{
     const {id}=req.params;
     const deletelisting=await Listing.findByIdAndDelete(id);
-    console.log(deletelisting);
     res.redirect("/listing");
 });

@@ -1,5 +1,12 @@
 body{
-   font-family: "Roboto", sans-serif !important;
+   font-family: "plus Jakarta Sans", sans-serif !important;
+   display: flex;
+   flex-direction: column;
+   min-height: 100vh;
+}
+
+.container{
+    flex:1;
 }
 
 /* navbar */
@@ -70,4 +77,22 @@ body{
 .card-img-overlay:hover{
     opacity: 0.2;
     background-color: white;
+}
+
+
+/* style new listing  and editing*/
+.add-btn{
+    background-color: #fe424d !important;
+    border:none !important;
+}
+/* show page wala part */
+.show-img{
+    height: 30vh;
+}
+.btns{
+   display: flex; 
+}
+.sho-card{
+    padding-left: 0;
+    padding-right: 0;
 }
