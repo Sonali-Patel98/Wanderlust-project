@@ -96,3 +96,7 @@ body{
     padding-left: 0;
     padding-right: 0;
 }
+.name{
+    color: #fe424d;
+    background-color: greenyellow;
+}
