@@ -3,48 +3,51 @@
     <div class="row">
         <div class="col-8 offset-2">
     <h1>Edit Your Listing</h1>
-    <form method="post" action="/listing/<%=idvalues._id  %>?_method=put">
+    <form method="post" action="/listing/<%=idvalues._id  %>?_method=put" novalidate class="needs-validation">
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input name="listall[title]" 
             value="<%=idvalues.title %>" 
             type="text"
-            class="form-control">
+            class="form-control"
+            required
+            />
+            <div class="valid-feedback">Title looks good!</div>
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
             <textarea 
-                name="listall[description]" class="form-control"><%=idvalues.description %>
+                name="listall[description]" class="form-control" required><%=idvalues.description %>  
             </textarea>
+            <div class="invalid-feedback">please enter a short description</div>
         </div>
         
         <div class="mb-3">
             <label for="image" class="form-label">Image Link</label>
-            <input name="listall[image][url]" value="<%=idvalues.image.url %>" type="text" class="form-control">
-       
+            <input name="listall[image][url]" value="<%=idvalues.image.url %>" type="text" class="form-control" required>
+            <div class="invalid-feedback">link should be valid </div>
         </div>
          
          <div class="row">
             <div class="mb-3 col-md-4">
                 <label for="price" class="form-label">Price</label>
-                <input name="listall[price]" value="<%=idvalues.price %>" type="number" class="form-control">
+                <input name="listall[price]" value="<%=idvalues.price %>" type="number" class="form-control" required>
+                <div class="invalid-feedback">price should be valid</div>
             </div>
+            
             <div class="mb-3 col-md-8" >
             <label for="country" class="form-label">Country</label>
-            <input name="listall[country]" value="<%=idvalues.country %>" type="text" class="form-control">
+            <input name="listall[country]" value="<%=idvalues.country %>" type="text" class="form-control" required>
+            <div class="invalid-feedback">country name should be valid</div>
             </div>
-        </div>
+            
         <div class="mb-3">
                 <label for="location" class="form-label">Location</label>
-                <input name="listall[location]" value="<%=idvalues.location %>" type="text" class="form-control">
-            </div>
+                <input name="listall[location]" value="<%=idvalues.location %>" type="text" class="form-control" required>
+                <div class="invalid-feedback">location name should be valid</div>
+        </div>
         <br>
         <button class="btn btn-dark add-btn">Edit</button>
-        <br><br>
-        <div class="name">hi sonali</div>
-         <button class="btn btn-dark add-btn">Edit</button>
-        <br><br>
-        <div class="name">hi sonali</div>
     </form>
     </div>
     </div>

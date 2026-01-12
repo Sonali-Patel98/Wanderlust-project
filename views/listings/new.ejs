@@ -13,6 +13,7 @@
                 class="form-control"
                 required
             />
+            <div class="valid-feedback">Title looks good!</div>
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
@@ -20,6 +21,7 @@
                 name="listall[description]"
                 class="form-control"  required>
             </textarea>
+            <div class="invalid-feedback">please enter a short description</div>
         </div>
         <div class="mb-3">
            <label for="image" class="form-label">Image Link</label>
@@ -40,6 +42,7 @@
                 class="form-control"
                 required
             />
+            <div class="invalid-feedback">price should be valid</div>
         </div>
         <div class="mb-3 col-md-8" >
             <label for="country" class="form-label">Country</label>
@@ -50,6 +53,7 @@
                 class="form-control"
                 required
             />
+            <div class="invalid-feedback">country name should be valid</div>
         </div>
         </div>
         
@@ -62,6 +66,7 @@
                 class="form-control"
                 required
             />
+            <div class="invalid-feedback">location name should be valid</div>
         </div>
         <br><br>
         <button class="btn btn-dark add-btn">Add</button>

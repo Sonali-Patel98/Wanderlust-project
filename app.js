@@ -3,6 +3,14 @@ const { default: mongoose } = require('mongoose');
 const app=express();
 
 
+
+//require ExpressError
+const ExpressError=require("./utils/ExpressError.js");
+
+
+//require custom WrapAsync
+const WrapAsyncs=require("./utils/wrapAsync.js");
+
 //require ejs-mate for layout
 const ejsMate=require("ejs-mate");
 app.engine('ejs', ejsMate);
@@ -16,6 +24,7 @@ const Listing=require("./models/listening.js");
 
 //path
 const path=require("path");
+const wrapAsync = require('./utils/wrapAsync.js');
 app.set("views",path.join(__dirname,"views"));
 app.set("view engine","ejs");
 
@@ -29,11 +38,8 @@ app.use(express.static(path.join(__dirname,"/public")));
 app.use(express.urlencoded({extended:true}));
 
 
-//local host server
-app.listen(8080,()=>{
-    console.log("server is listening to port 8080");
 
-});
+
 app.get("/",(req,res)=>{
     res.send("hi i'm root");
 });
@@ -58,7 +64,7 @@ app.get("/",(req,res)=>{
     res.send("fist server is working");
 })
 
-app.get("/testListing",async(req,res)=>{
+app.get("/testListing",wrapAsync(async(req,res)=>{
     let sample=new Listing({
         title:"My new Villa",
         description:"By the beach",
@@ -70,13 +76,13 @@ app.get("/testListing",async(req,res)=>{
     await sample.save();
     console.log("sample was saved");
     res.send("Successful testing");
-});
+}));
 
 //index route
-app.get("/listing",async(req,res)=>{
+app.get("/listing",wrapAsync(async(req,res)=>{
     const values=await Listing.find({});
     res.render("listings/indexRoute",{values});
-})
+}));
 
 //CRUD KA CREATE OPERATIONS
 app.get("/listing/new",(req,res)=>{
@@ -85,42 +91,69 @@ app.get("/listing/new",(req,res)=>{
 
 //CRUD KA READ(SHOW) OPERATIONS
 
-app.get("/listing/:id",async(req,res)=>{
+app.get("/listing/:id",wrapAsync(async(req,res)=>{
     let {id}=req.params;
     const idvalues=await Listing.findById(id);
     res.render("listings/read",{idvalues});
-});
+}));
 
 //post new create
-app.post("/listing",async(req,res)=>{
-    const listall=new Listing(req.body.listall);
-    listall.image.filename="listingimage";
-    await listall.save();
-    res.redirect("/listing");
-});
+app.post("/listing",WrapAsyncs(async(req,res,next)=>{
+        if(!req.body.listall){
+            throw new ExpressError(400,"send valid data for listing ");
+        }
+        const listall=new Listing(req.body.listall);
+        listall.image.filename="listingimage";
+        await listall.save();
+        res.redirect("/listing");
+}));
 
 
 
 //Edit route
-app.get("/listing/:id/edit",async(req,res)=>{
+app.get("/listing/:id/edit",wrapAsync(async(req,res)=>{
     let {id}=req.params;
     const idvalues=await Listing.findById(id);
     res.render("listings/edit",{idvalues});
-})
+}));
 
 
 //update route 
-app.put("/listing/:id",async(req,res)=>{
+app.put("/listing/:id",wrapAsync(async(req,res)=>{
+     if(!req.body.listall){
+            throw new ExpressError(400,"send valid data for listing ");
+        }
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id,req.body.listall);
     res.redirect(`/listing/${id}`);
-});
+}));
 
 
 
 //delete route
-app.delete("/listing/:id",async(req,res)=>{
+app.delete("/listing/:id",wrapAsync(async(req,res)=>{
     const {id}=req.params;
     const deletelisting=await Listing.findByIdAndDelete(id);
     res.redirect("/listing");
+}));
+
+app.use((req,res,next)=>{
+    next(new ExpressError(404,"page not found!"));
 });
+
+
+//handling error middleware
+app.use((err,req,res,next)=>{
+    let {statusCode=500,message="Something went wrong"}=err;
+    res.status(statusCode).send(message);
+});
+
+
+
+
+//local host server
+app.listen(8080,()=>{
+    console.log("server is listening to port 8080");
+
+});
+
