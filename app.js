@@ -2,7 +2,8 @@ const express=require('express');
 const { default: mongoose } = require('mongoose');
 const app=express();
 
-
+//require joi for validation for schema server side 
+const{listingSchema}=require("./schema.js");
 
 //require ExpressError
 const ExpressError=require("./utils/ExpressError.js");
@@ -99,8 +100,10 @@ app.get("/listing/:id",wrapAsync(async(req,res)=>{
 
 //post new create
 app.post("/listing",WrapAsyncs(async(req,res,next)=>{
-        if(!req.body.listall){
-            throw new ExpressError(400,"send valid data for listing ");
+        let result=listingSchema.validate(req.body);
+        console.log(result);
+        if(result.error){
+            throw new ExpressError(400,result.error);
         }
         const listall=new Listing(req.body.listall);
         listall.image.filename="listingimage";
@@ -122,7 +125,7 @@ app.get("/listing/:id/edit",wrapAsync(async(req,res)=>{
 app.put("/listing/:id",wrapAsync(async(req,res)=>{
      if(!req.body.listall){
             throw new ExpressError(400,"send valid data for listing ");
-        }
+    }
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id,req.body.listall);
     res.redirect(`/listing/${id}`);
@@ -145,7 +148,8 @@ app.use((req,res,next)=>{
 //handling error middleware
 app.use((err,req,res,next)=>{
     let {statusCode=500,message="Something went wrong"}=err;
-    res.status(statusCode).send(message);
+    // res.status(statusCode).send(message);
+    res.status(statusCode).render("error.ejs",{message});
 });
 
 
