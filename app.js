@@ -45,6 +45,22 @@ app.get("/",(req,res)=>{
     res.send("hi i'm root");
 });
 
+//validation for Schema(middleware)
+const validatelisting=(req,res,next)=>{
+    let {error}=listingSchema.validate(req.body);
+    if(error){
+        let errMsg=error.details.map((el)=> el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }
+    else{
+        next();
+    }
+};
+
+
+
+
+
 //connect mongdb and nodejs through mongoose
 
 async function main(){
@@ -99,17 +115,15 @@ app.get("/listing/:id",wrapAsync(async(req,res)=>{
 }));
 
 //post new create
-app.post("/listing",WrapAsyncs(async(req,res,next)=>{
-        let result=listingSchema.validate(req.body);
-        console.log(result);
-        if(result.error){
-            throw new ExpressError(400,result.error);
-        }
+app.post("/listing",
+    validatelisting,
+    WrapAsyncs(async(req,res,next)=>{
         const listall=new Listing(req.body.listall);
         listall.image.filename="listingimage";
         await listall.save();
         res.redirect("/listing");
-}));
+    })
+);
 
 
 
@@ -122,10 +136,7 @@ app.get("/listing/:id/edit",wrapAsync(async(req,res)=>{
 
 
 //update route 
-app.put("/listing/:id",wrapAsync(async(req,res)=>{
-     if(!req.body.listall){
-            throw new ExpressError(400,"send valid data for listing ");
-    }
+app.put("/listing/:id",validatelisting,wrapAsync(async(req,res)=>{
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id,req.body.listall);
     res.redirect(`/listing/${id}`);
