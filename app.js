@@ -2,15 +2,12 @@ const express=require('express');
 const { default: mongoose } = require('mongoose');
 const app=express();
 
-//require joi for validation for schema server side 
-const{listingSchema}=require("./schema.js");
 
 //require ExpressError
 const ExpressError=require("./utils/ExpressError.js");
 
 
-//require custom WrapAsync
-const WrapAsyncs=require("./utils/wrapAsync.js");
+
 
 //require ejs-mate for layout
 const ejsMate=require("ejs-mate");
@@ -20,7 +17,7 @@ app.engine('ejs', ejsMate);
 const methodOverride=require("method-override");
 app.use(methodOverride("_method"));
 
-//reuire model
+//reuire model of listing
 const Listing=require("./models/listening.js");
 
 //path
@@ -38,24 +35,67 @@ app.use(express.static(path.join(__dirname,"/public")));
 //fetch requesting data like id
 app.use(express.urlencoded({extended:true}));
 
+const listingsRouter=require("./routes/listing.js");
+const reviewRouter=require("./routes/reviews.js");
+
+//require for express-session for cookies
+const session=require("express-session");
+
+//require for rotes user sign and login
+const userRouter=require("./routes/user.js");
 
 
+
+const sessionOptions={
+    secret:"mysupersecretcode",
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        expires:Date.now()+ 7 * 24 * 60 *1000,   //for 7 days
+         maxAge:7 * 24 * 60 *1000,
+         httpOnly:true,
+    },
+};
+app.use(session(sessionOptions));
+
+//for flash
+const flash=require("connect-flash");
+app.use(flash());
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    next();
+});
+
+const passport=require("passport");
+const localStrategy=require("passport-local");
+const User=require("./models/user.js");
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+
+
+
+
+
+
+
+
+
+
+// for resturing listing and from listing.js
+app.use("/listing",listingsRouter);
+// for resturing revies and from reviews.js
+app.use("/listing/:id/reviews",reviewRouter);
+app.use("/",userRouter);
 
 app.get("/",(req,res)=>{
     res.send("hi i'm root");
 });
-
-//validation for Schema(middleware)
-const validatelisting=(req,res,next)=>{
-    let {error}=listingSchema.validate(req.body);
-    if(error){
-        let errMsg=error.details.map((el)=> el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }
-    else{
-        next();
-    }
-};
 
 
 
@@ -95,61 +135,11 @@ app.get("/testListing",wrapAsync(async(req,res)=>{
     res.send("Successful testing");
 }));
 
-//index route
-app.get("/listing",wrapAsync(async(req,res)=>{
-    const values=await Listing.find({});
-    res.render("listings/indexRoute",{values});
-}));
-
-//CRUD KA CREATE OPERATIONS
-app.get("/listing/new",(req,res)=>{
-    res.render("listings/new");
-})
-
-//CRUD KA READ(SHOW) OPERATIONS
-
-app.get("/listing/:id",wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    const idvalues=await Listing.findById(id);
-    res.render("listings/read",{idvalues});
-}));
-
-//post new create
-app.post("/listing",
-    validatelisting,
-    WrapAsyncs(async(req,res,next)=>{
-        const listall=new Listing(req.body.listall);
-        listall.image.filename="listingimage";
-        await listall.save();
-        res.redirect("/listing");
-    })
-);
 
 
 
-//Edit route
-app.get("/listing/:id/edit",wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    const idvalues=await Listing.findById(id);
-    res.render("listings/edit",{idvalues});
-}));
 
 
-//update route 
-app.put("/listing/:id",validatelisting,wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    await Listing.findByIdAndUpdate(id,req.body.listall);
-    res.redirect(`/listing/${id}`);
-}));
-
-
-
-//delete route
-app.delete("/listing/:id",wrapAsync(async(req,res)=>{
-    const {id}=req.params;
-    const deletelisting=await Listing.findByIdAndDelete(id);
-    res.redirect("/listing");
-}));
 
 app.use((req,res,next)=>{
     next(new ExpressError(404,"page not found!"));
@@ -162,8 +152,6 @@ app.use((err,req,res,next)=>{
     // res.status(statusCode).send(message);
     res.status(statusCode).render("error.ejs",{message});
 });
-
-
 
 
 //local host server
