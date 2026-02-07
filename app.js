@@ -58,14 +58,21 @@ const sessionOptions={
 };
 app.use(session(sessionOptions));
 
-//for flash
-const flash=require("connect-flash");
-app.use(flash());
-app.use((req,res,next)=>{
-    res.locals.success=req.flash("success");
-    res.locals.error=req.flash("error");
-    next();
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const passport=require("passport");
 const localStrategy=require("passport-local");
@@ -78,14 +85,15 @@ passport.deserializeUser(User.deserializeUser());
 
 
 
-
-
-
-
-
-
-
-
+//for flash
+const flash=require("connect-flash");
+app.use(flash());
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    res.locals.currUser=req.user;
+    next();
+});
 
 // for resturing listing and from listing.js
 app.use("/listing",listingsRouter);
@@ -96,7 +104,6 @@ app.use("/",userRouter);
 app.get("/",(req,res)=>{
     res.send("hi i'm root");
 });
-
 
 
 

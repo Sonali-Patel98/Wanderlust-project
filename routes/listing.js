@@ -15,6 +15,9 @@ const wrapAsync = require('../utils/wrapAsync.js');
 //require joi for validation for schema server side 
 const{listingSchema,reviewSchema}=require("../schema.js");
 
+//for connecting login authorization
+const {isLoggedIn}=require("../middleware.js");
+
 
 //validation for Schema(middleware) listing
 const validatelisting=(req,res,next)=>{
@@ -40,7 +43,7 @@ router.get("/",wrapAsync(async(req,res)=>{
 }));
 
 //CRUD KA CREATE OPERATIONS
-router.get("/new",(req,res)=>{
+router.get("/new",isLoggedIn,(req,res)=>{
     res.render("listings/new");
 })
 
@@ -60,6 +63,7 @@ router.get("/:id",wrapAsync(async(req,res)=>{
 
 //post new create
 router.post("/",
+    isLoggedIn,
     validatelisting,
     WrapAsyncs(async(req,res,next)=>{
         const listall=new Listing(req.body.listall);
@@ -73,7 +77,7 @@ router.post("/",
 
 
 //Edit route
-router.get("/:id/edit",wrapAsync(async(req,res)=>{
+router.get("/:id/edit",isLoggedIn,wrapAsync(async(req,res)=>{
     let {id}=req.params;
     const idvalues=await Listing.findById(id);
     if(!idvalues){
@@ -85,7 +89,7 @@ router.get("/:id/edit",wrapAsync(async(req,res)=>{
 
 
 //update route 
-router.put("/:id",validatelisting,wrapAsync(async(req,res)=>{
+router.put("/:id",isLoggedIn,validatelisting,wrapAsync(async(req,res)=>{
     let {id}=req.params;
     await Listing.findByIdAndUpdate(id,req.body.listall);
     req.flash("success","Listing Updated");
@@ -95,7 +99,7 @@ router.put("/:id",validatelisting,wrapAsync(async(req,res)=>{
 
 
 //delete route
-router.delete("/:id",wrapAsync(async(req,res)=>{
+router.delete("/:id",isLoggedIn,wrapAsync(async(req,res)=>{
     const {id}=req.params;
     const deletelisting=await Listing.findByIdAndDelete(id);
     req.flash("success","Listing deleted");
