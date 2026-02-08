@@ -13,97 +13,34 @@ const ExpressError=require("../utils/ExpressError.js");
 const wrapAsync = require('../utils/wrapAsync.js');
 
 //require joi for validation for schema server side 
-const{listingSchema,reviewSchema}=require("../schema.js");
+const{listingSchema,reviewSchema,}=require("../schema.js");
 
 //for connecting login authorization
-const {isLoggedIn}=require("../middleware.js");
+const {isLoggedIn,isOwner,validatelisting}=require("../middleware.js");
 
+//controllers of listing
+const listingController=require("../controllers/listing.js");
 
-//validation for Schema(middleware) listing
-const validatelisting=(req,res,next)=>{
-    let {error}=listingSchema.validate(req.body);
-    if(error){
-        let errMsg=error.details.map((el)=> el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }
-    else{
-        next();
-    }
-};
+router.route("/")
+        //index route
+    .get(wrapAsync(listingController.index))
+    //post new create
+    .post(isLoggedIn,validatelisting,WrapAsyncs(listingController.newPostCreate));
 
-
-
-
-
-
-//index route
-router.get("/",wrapAsync(async(req,res)=>{
-    const values=await Listing.find({});
-    res.render("listings/indexRoute",{values});
-}));
 
 //CRUD KA CREATE OPERATIONS
-router.get("/new",isLoggedIn,(req,res)=>{
-    res.render("listings/new");
-})
+router.get("/new",isLoggedIn,listingController.renderNewForm);
 
-//CRUD KA READ(SHOW) OPERATIONS
-
-router.get("/:id",wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    const idvalues=await Listing.findById(id).populate("reviews");
-    if(!idvalues){
-         req.flash("error","Listing you are requesting  doesn't exist");
-         return res.redirect("/listing");
-    }
-    res.render("listings/read",{idvalues});
-}));
-
-
-
-//post new create
-router.post("/",
-    isLoggedIn,
-    validatelisting,
-    WrapAsyncs(async(req,res,next)=>{
-        const listall=new Listing(req.body.listall);
-        listall.image.filename="listingimage";
-        await listall.save();
-        req.flash("success","New Listing Created");
-        res.redirect("/listing");
-    })
-);
+router.route("/:id")   
+        //CRUD KA READ(SHOW) OPERATIONS
+    .get(wrapAsync(listingController.alllisting))
+    //update route 
+    .put(isLoggedIn,isOwner,validatelisting,wrapAsync(listingController.update))
+    //delete route
+    .delete(isLoggedIn,isOwner,wrapAsync(listingController.delete));
 
 
 
 //Edit route
-router.get("/:id/edit",isLoggedIn,wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    const idvalues=await Listing.findById(id);
-    if(!idvalues){
-         req.flash("error","Listing you are requesting  doesn't exist");
-         return res.redirect("/listing");
-    }
-    res.render("listings/edit",{idvalues});
-}));
-
-
-//update route 
-router.put("/:id",isLoggedIn,validatelisting,wrapAsync(async(req,res)=>{
-    let {id}=req.params;
-    await Listing.findByIdAndUpdate(id,req.body.listall);
-    req.flash("success","Listing Updated");
-    res.redirect(`/listing/${id}`);
-}));
-
-
-
-//delete route
-router.delete("/:id",isLoggedIn,wrapAsync(async(req,res)=>{
-    const {id}=req.params;
-    const deletelisting=await Listing.findByIdAndDelete(id);
-    req.flash("success","Listing deleted");
-    res.redirect("/listing");
-}));
-
+router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.edit));
 module.exports=router;

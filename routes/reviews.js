@@ -12,41 +12,17 @@ const{listingSchema,reviewSchema}=require("../schema.js");
 
 //require model of reviews
 const Review=require("../models/review.js");
+const {isReviewsAuthor,validateReview,isLoggedIn}=require("../middleware.js");
 
-//validation for Schema(middleware) review
-const validateReview=(req,res,next)=>{
-    let {error}=reviewSchema.validate(req.body);
-    if(error){
-        let errMsg=error.details.map((el)=> el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }
-    else{
-        next();
-    }
-};
+
+//controllers of listing
+const listingController=require("../controllers/review.js");
 
 
 
 // Reviews post Route
-router.post("/",validateReview, wrapAsync(async(req,res)=>{
-    let listing=await Listing.findById(req.params.id);
-    let newReview=new Review(req.body.review);
-    await newReview.save();
-    listing.reviews.push(newReview);
-    await listing.save();
-    req.flash("success","New Reviews Created");
-    res.redirect(`/listing/${listing._id}`);
-}));
+router.post("/",isLoggedIn,validateReview, wrapAsync(listingController.createReview));
 //Review delete Route
-router.delete("/:reviewId",
-    wrapAsync(async(req,res)=>{
-       let {id,reviewId} =req.params;
-       await Listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}});
-       await Review.findByIdAndDelete(reviewId);
-       req.flash("success","Reviews deleted");
-       res.redirect(`/listing/${id}`);
-    })
-    
-);
+router.delete("/:reviewId",isLoggedIn,isReviewsAuthor,wrapAsync(listingController.deleteReview));
 
 module.exports=router;

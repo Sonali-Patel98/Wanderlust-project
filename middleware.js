@@ -1,3 +1,13 @@
+const Listing=require("./models/listening");
+//require model of reviews
+const Review=require("./models/review.js");
+
+//require joi for validation for schema server side 
+const{listingSchema,reviewSchema}=require("./schema.js");
+
+//require ExpressError
+const ExpressError=require("./utils/ExpressError.js");
+
 module.exports.isLoggedIn=(req,res,next)=>{
     if(!req.isAuthenticated()){
         req.session.redirectUrl=req.originalUrl;
@@ -12,3 +22,46 @@ module.exports.saveRedirectUrl=(req,res,next)=>{
     }
     next();
 }
+module.exports.isOwner=async(req,res,next)=>{
+    let {id}=req.params;
+    let listing=await Listing.findById(id);
+    if(!listing.owner._id.equals(res.locals.currUser._id)){
+        req.flash("error","You don't have permission");
+       return res.redirect(`/listing/${id}`);
+    }
+    next();
+};
+//validation for Schema(middleware) listing
+module.exports.validatelisting=(req,res,next)=>{
+    let {error}=listingSchema.validate(req.body);
+    if(error){
+        let errMsg=error.details.map((el)=> el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }
+    else{
+        next();
+    }
+};
+
+
+//validation for Schema(middleware) review
+module.exports.validateReview=(req,res,next)=>{
+    let {error}=reviewSchema.validate(req.body);
+    if(error){
+        let errMsg=error.details.map((el)=> el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }
+    else{
+        next();
+    }
+};
+
+module.exports.isReviewsAuthor=async(req,res,next)=>{
+    let {id,reviewId}=req.params;
+    let review=await Review.findById(reviewId);
+    if(!review.author.equals(res.locals.currUser._id)){
+        req.flash("error","You don't have permission because you are not author");
+       return res.redirect(`/listing/${id}`);
+    }
+    next();
+};

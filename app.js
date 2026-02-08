@@ -94,7 +94,7 @@ app.use((req,res,next)=>{
     res.locals.currUser=req.user;
     next();
 });
-
+ 
 // for resturing listing and from listing.js
 app.use("/listing",listingsRouter);
 // for resturing revies and from reviews.js
@@ -159,6 +159,7 @@ app.use((err,req,res,next)=>{
     // res.status(statusCode).send(message);
     res.status(statusCode).render("error.ejs",{message});
 });
+
 
 
 //local host server
