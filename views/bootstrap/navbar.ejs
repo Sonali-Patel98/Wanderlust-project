@@ -1,3 +1,4 @@
+
 <style>
   .btn-search{
     background-color: #fe424d;
@@ -45,7 +46,8 @@
         <% if(!currUser) {%>
         <a class="nav-link" href="/signup"><b>Signup</b></a>
         <a class="nav-link" href="/login"><b>Login</b></a>
-        <% } else {%>
+        <% }%>
+        <%if (currUser){%>
         <a class="nav-link" href="/logout"><b>Logout</b></a>
         <% } %>
       </div>
