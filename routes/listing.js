@@ -5,7 +5,7 @@ const router=express.Router();
 const Listing=require("../models/listening.js");
 
 //require custom WrapAsync
-const WrapAsyncs=require("../utils/wrapAsync.js");
+// const WrapAsyncs=require("../utils/wrapAsync.js");
 
 //require ExpressError
 const ExpressError=require("../utils/ExpressError.js");
@@ -20,27 +20,54 @@ const {isLoggedIn,isOwner,validatelisting}=require("../middleware.js");
 
 //controllers of listing
 const listingController=require("../controllers/listing.js");
+const { resolveInclude } = require("ejs");
+//for multer for file
+const multer  = require('multer');
+//for storage in cloud
+const {storage}=require("../cloudConfig.js");
+const upload = multer({storage});
+
 
 router.route("/")
         //index route
     .get(wrapAsync(listingController.index))
     //post new create
-    .post(isLoggedIn,validatelisting,WrapAsyncs(listingController.newPostCreate));
-
+    .post(
+        isLoggedIn,
+        validatelisting,
+        upload.single('listall[image][url]'),
+        // WrapAsyncs(listingController.newPostCreate)
+        wrapAsync(listingController.newPostCreate)
+    );
+    
 
 //CRUD KA CREATE OPERATIONS
 router.get("/new",isLoggedIn,listingController.renderNewForm);
 
-router.route("/:id")   
-        //CRUD KA READ(SHOW) OPERATIONS
+
+//Edit route
+router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.edit));
+
+
+
+
+
+
+router
+    .route("/:id")   
+    //CRUD KA READ(SHOW) OPERATIONS
     .get(wrapAsync(listingController.alllisting))
     //update route 
-    .put(isLoggedIn,isOwner,validatelisting,wrapAsync(listingController.update))
+    .put(
+        isLoggedIn,
+        isOwner,
+         upload.single('listall[image][url]'),
+        validatelisting,
+        wrapAsync(listingController.update))
     //delete route
     .delete(isLoggedIn,isOwner,wrapAsync(listingController.delete));
 
 
 
-//Edit route
-router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.edit));
+
 module.exports=router;

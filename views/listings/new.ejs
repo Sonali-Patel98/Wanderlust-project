@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-8 offset-2">
     <h1>Create a new list</h1>
-    <form method="post" action="/listing" novalidate class="needs-validation">
+    <form method="post" action="/listing" novalidate class="needs-validation" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input 
@@ -24,12 +24,12 @@
             <div class="invalid-feedback">please enter a short description</div>
         </div>
         <div class="mb-3">
-           <label for="image" class="form-label">Image Link</label>
+           <label for="image" class="form-label">Upload Listing Image</label>
             <input 
                 name="listall[image][url]" 
-                placeholder="enter image URK/LINK" 
-                type="text"
+                type="file"
                 class="form-control"
+                required
             />
         </div>
         <div class="row" >

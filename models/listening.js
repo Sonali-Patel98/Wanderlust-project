@@ -11,14 +11,8 @@ const listing=new Schema({
         type:String,
     },
     image: {
-        filename: {
-            type: String,
-            default: "listingimage"
-        },
-        url: {
-            type: String,
-            default: "https://images.unsplash.com/photo-1767016311533-8365d673f91b?q=80&w=1318&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wY",
-        }
+        url:String,
+        filename:String,
     },
 
     price:{
@@ -39,8 +33,18 @@ const listing=new Schema({
     owner:{
         type:Schema.Types.ObjectId,
         ref:"User",
+    },
+    geometry: {
+    type: {
+      type: String, // Don't do `{ location: { type: String } }`
+      enum: ['Point'], // 'location.type' must be 'Point'
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
     }
-    
+  }  
 });
 listing.post("findOneAndDelete",async(listing)=>{
     if(listing){

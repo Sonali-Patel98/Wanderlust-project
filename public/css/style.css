@@ -100,3 +100,8 @@ body{
     color: #fe424d;
     background-color: greenyellow;
 }
+
+#map{
+    height: 400px;
+    width: 80vh;
+}

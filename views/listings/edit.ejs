@@ -1,9 +1,14 @@
 <% layout("/layouts/boilerplate") %>
+<script>
+    const mapToken="<%= process.env.MAP_tOKEN %>";
+    const listing=JSON.parse('<%- JSON.stringify(idvalues) %>');
+</script>
+
     <br><br>
     <div class="row">
         <div class="col-8 offset-2">
     <h1>Edit Your Listing</h1>
-    <form method="post" action="/listing/<%=idvalues._id  %>?_method=put" novalidate class="needs-validation">
+    <form method="post" action="/listing/<%=idvalues._id  %>?_method=put" novalidate class="needs-validation" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
             <input name="listall[title]" 
@@ -23,9 +28,12 @@
         </div>
         
         <div class="mb-3">
-            <label for="image" class="form-label">Image Link</label>
-            <input name="listall[image][url]" value="<%=idvalues.image.url %>" type="text" class="form-control" required>
-            <div class="invalid-feedback">link should be valid </div>
+            <label for="image" class="form-label">Upload New Image</label>
+            <input 
+                name="listall[image][url]"
+                type="file" 
+                class="form-control"
+            >
         </div>
          
          <div class="row">
@@ -50,4 +58,8 @@
         <button class="btn btn-dark add-btn">Edit</button>
     </form>
     </div>
+    <div class="col-7 offset-0 mb-3">
+            <div id="map"></div>
+        </div>
     </div>
+<script src="/js/map.js"></script>
