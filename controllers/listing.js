@@ -5,10 +5,6 @@ const geocodingClient = mbxGeocoding({accessToken: mapToken});
 module.exports.index=async(req,res)=>{
     const values=await Listing.find({});
     res.render("listings/indexRoute",{values});
-
-    
-
-
 };
 module.exports.renderNewForm=(req,res)=>{
     res.render("listings/new");
@@ -29,6 +25,7 @@ module.exports.alllisting=(async(req,res)=>{
     }
     res.render("listings/read",{idvalues});
 });
+console.log("req.file =", req.file);
 module.exports.newPostCreate=(async(req,res,next)=>{
     // geocoding in structured input mode
     let response=await geocodingClient
