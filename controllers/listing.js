@@ -25,8 +25,9 @@ module.exports.alllisting=(async(req,res)=>{
     }
     res.render("listings/read",{idvalues});
 });
-console.log("req.file =", req.file);
+
 module.exports.newPostCreate=(async(req,res,next)=>{
+    console.log("req.file =", req.file);
     // geocoding in structured input mode
     let response=await geocodingClient
     .forwardGeocode({
