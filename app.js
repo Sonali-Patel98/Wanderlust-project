@@ -20,7 +20,9 @@ const dbUrl = process.env.ATLASDB_URL;
 
 const store = MongoStore.create({
   mongoUrl: dbUrl,
-  secret: process.env.SECRET,
+  crypto:{
+    secret: process.env.SECRET,
+  },
   touchAfter: 24 * 3600,
 });
 
